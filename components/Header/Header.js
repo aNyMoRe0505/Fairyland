@@ -95,7 +95,7 @@ const links = [
 
 const Header = () => {
   return (
-    <Root>
+    <Root id="header">
       <HeaderRoot>
         <Container>
           <Link href={URLS.HOME}>

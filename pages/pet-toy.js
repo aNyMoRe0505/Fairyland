@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
+import ReactDOM from 'react-dom';
+import { usePopper } from 'react-popper';
 import styled, { css } from 'styled-components';
 
 import Image from '@/components/Image';
+import allPet from '@/data/pet';
 import allToy from '@/data/toy';
 
 const Root = styled.div`
@@ -14,10 +17,7 @@ const SearchBox = styled.div`
   display: flex;
   box-shadow: 0px 0px 5px 0px black;
   border-radius: 21px;
-  background: white;
   padding: 30px;
-  position: sticky;
-  top: 80px;
 `;
 
 const SearchSection = styled.div`
@@ -120,6 +120,14 @@ const TableHead = styled.div`
   font-size: 16px;
   flex: 1;
   text-align: center;
+
+  :nth-child(6) {
+    flex: 2;
+  }
+
+  :nth-child(7) {
+    flex: 2;
+  }
 `;
 
 const TableResultWrapper = styled.div`
@@ -152,6 +160,14 @@ const TableColumn = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  :nth-child(6) {
+    flex: 2;
+  }
+
+  :nth-child(7) {
+    flex: 2;
+  }
 `;
 
 const ToyIcon = styled(Image)`
@@ -178,6 +194,97 @@ const Map = styled.div`
   }
 `;
 
+const PopupContainer = styled.div`
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 0px 5px 0px black;
+  border-radius: 20px;
+  padding: 20px;
+  background-color: white;
+`;
+
+const PetIcon = styled(Image)`
+  min-width: 150px;
+  width: 150px;
+  margin: 0 15px 0 0;
+`;
+
+const PetContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const PetName = styled.div`
+  font-size: 16px;
+  font-weight: bold;
+  color: black;
+`;
+
+const PetContentText = styled.div`
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 0;
+`;
+
+// eslint-disable-next-line react/prop-types
+const PetDetailPopup = ({ petName }) => {
+  const [isShow, setIsShow] = useState(false);
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const isClient = typeof window !== 'undefined';
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    placement: 'top',
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 20],
+        },
+      },
+    ],
+  });
+
+  const targetPet = allPet.find((pet) => pet.name.includes(petName));
+
+  return (
+    <>
+      <Map
+        onMouseLeave={() => setIsShow(false)}
+        onMouseEnter={() => setIsShow(true)}
+        ref={setReferenceElement}
+      >
+        {petName}
+      </Map>
+      {isClient &&
+        isShow &&
+        targetPet &&
+        ReactDOM.createPortal(
+          <PopupContainer
+            ref={setPopperElement}
+            style={styles.popper}
+            {...attributes.popper}
+          >
+            <PetIcon src={`/pet/${targetPet.id}.gif`} />
+            <PetContent>
+              <PetName>{targetPet.name}</PetName>
+              <PetContentText>等級：{targetPet.level}</PetContentText>
+              <PetContentText>偏向：{targetPet.speciesDir}</PetContentText>
+              <PetContentText>屬性：{targetPet.element}</PetContentText>
+              <PetContentText>掉落：{targetPet.drop}</PetContentText>
+              <PetContentText>技能數量：{targetPet.skillAmount}</PetContentText>
+              <PetContentText>
+                技能：{targetPet.skill.join(', ')}
+              </PetContentText>
+              <PetContentText>地圖：{targetPet.map.join(', ')}</PetContentText>
+            </PetContent>
+          </PopupContainer>,
+          document.body
+        )}
+    </>
+  );
+};
+
 const allToyLevel = ['all', 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70];
 const allToyAbility = ['all', 25, 30, 35, 40, 45, 50];
 
@@ -196,10 +303,10 @@ const PetToy = () => {
           <TableHead>等級</TableHead>
           <TableHead>名稱</TableHead>
           <TableHead>基底</TableHead>
+          <TableHead>娃娃</TableHead>
+          <TableHead>數值上限 (娃娃數量 * 5)</TableHead>
           <TableHead>材料</TableHead>
-          <TableHead>地圖</TableHead>
-          <TableHead>娃娃上限</TableHead>
-          <TableHead>數值上限</TableHead>
+          <TableHead>卡娃地圖</TableHead>
         </TableHeaderWrapper>
         <TableResultWrapper>
           {result.map((r) => (
@@ -213,6 +320,10 @@ const PetToy = () => {
                 <ToyIcon src={`/toy/B${r.id}.gif`} alt="toyIcon" />
                 {r.base}
               </TableColumn>
+              <TableColumn>
+                <PetDetailPopup petName={r.petsRelated} />
+              </TableColumn>
+              <TableColumn>{r.statusLimit}</TableColumn>
               <TableColumn>{r.item}</TableColumn>
               <TableColumn>
                 {r.map.map((mapName) => (
@@ -220,6 +331,11 @@ const PetToy = () => {
                     $unClickable={mapName === '魔幣寵'}
                     onClick={() => {
                       if (mapName !== '魔幣寵') {
+                        const mapedResult = result.filter((sr) =>
+                          sr.map.join().includes(mapName)
+                        );
+                        setMap(mapName);
+                        setResult(mapedResult);
                         window.open(`/pet?map=${mapName}`);
                       }
                     }}
@@ -229,8 +345,6 @@ const PetToy = () => {
                   </Map>
                 ))}
               </TableColumn>
-              <TableColumn>{r.dollLimit}</TableColumn>
-              <TableColumn>{r.statusLimit}</TableColumn>
             </TableRowWrapper>
           ))}
         </TableResultWrapper>

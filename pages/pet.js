@@ -162,7 +162,6 @@ const PetDetailBox = styled.div`
 const PetIcon = styled(Image)`
   min-width: 200px;
   width: 200px;
-  height: 200px;
   margin: 0 15px 0 0;
 `;
 
