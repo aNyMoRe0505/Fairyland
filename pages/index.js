@@ -60,6 +60,9 @@ export default function Home() {
         </a>
         , 歡迎加功能或提需求
       </Text>
+      <Text>
+        另外這個網站還沒有手機版本XD, 所以用手機看可能會跑版, 之後有機會再來做
+      </Text>
     </Root>
   );
 }

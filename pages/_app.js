@@ -33,8 +33,6 @@ function MyApp({ Component, pageProps }) {
     smoothscroll.polyfill();
   }, []);
 
-  console.log('process.env.NODE_ENV', process.env.NODE_ENV);
-
   return (
     <>
       <GlobalStyle />
