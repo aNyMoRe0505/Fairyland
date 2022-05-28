@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
 import Head from 'next/head';
+import Script from 'next/script';
 import { useEffect } from 'react';
 import smoothscroll from 'smoothscroll-polyfill';
 import { createGlobalStyle } from 'styled-components';
 
 import GoTop from '@/components/GoTop';
+import clarityInitScript from '@/tracking/clarity';
 
 import SharedLayout from '../components/SharedLayout';
 
@@ -31,6 +33,8 @@ function MyApp({ Component, pageProps }) {
     smoothscroll.polyfill();
   }, []);
 
+  console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+
   return (
     <>
       <GlobalStyle />
@@ -39,6 +43,13 @@ function MyApp({ Component, pageProps }) {
         <meta name="description" content="Fairyland Info" />
         <title>Fairyland Info</title>
       </Head>
+      {process.env.NODE_ENV === 'production' && (
+        <Script
+          id="clarity-js"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: clarityInitScript }}
+        />
+      )}
       <GoTop />
       <SharedLayout>
         <Component {...pageProps} />
