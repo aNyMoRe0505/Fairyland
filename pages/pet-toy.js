@@ -1,3 +1,5 @@
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { usePopper } from 'react-popper';
@@ -117,18 +119,34 @@ const TableHeaderWrapper = styled.div`
   align-items: center;
 `;
 
-const TableHead = styled.div`
-  font-size: 16px;
+const ColumnWidthCSS = css`
   flex: 1;
-  text-align: center;
 
+  :nth-child(1),
+  :nth-child(5) {
+    max-width: 100px;
+  }
   :nth-child(6) {
     flex: 2;
   }
-
   :nth-child(7) {
-    flex: 2;
+    flex: 3;
   }
+`;
+
+const TableHead = styled.div`
+  font-size: 16px;
+  text-align: center;
+  ${ColumnWidthCSS}
+`;
+
+const TableColumn = styled.div`
+  font-size: 16px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${ColumnWidthCSS}
 `;
 
 const TableResultWrapper = styled.div`
@@ -154,27 +172,17 @@ const TableRowWrapper = styled.div`
   }
 `;
 
-const TableColumn = styled.div`
-  font-size: 16px;
-  flex: 1;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  :nth-child(6) {
-    flex: 2;
-  }
-
-  :nth-child(7) {
-    flex: 2;
-  }
-`;
-
 const ToyIcon = styled(Image)`
   width: 40px;
   height: 40px;
   margin: 0 10px 0 0;
+`;
+
+const MapArrowWrapper = styled.div`
+  position: relative;
+  & + & {
+    margin: 0 0 0 15px;
+  }
 `;
 
 const Map = styled.div`
@@ -189,10 +197,6 @@ const Map = styled.div`
         }
       }
     `};
-
-  & + & {
-    margin: 0 0 0 5px;
-  }
 `;
 
 const PopupContainer = styled.div`
@@ -226,6 +230,28 @@ const PetContentText = styled.div`
   font-size: 14px;
   font-weight: bold;
   margin: 10px 0 0;
+`;
+
+const Arrow = styled(FontAwesomeIcon).attrs({
+  icon: faArrowUp,
+})`
+  && {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    color: #168ccdde;
+    transform: rotate(45deg);
+    margin: 0 0 0 3px;
+    position: absolute;
+    top: 0;
+    right: -15px;
+
+    @media (hover: hover) {
+      :hover {
+        opacity: 0.8;
+      }
+    }
+  }
 `;
 
 // eslint-disable-next-line react/prop-types
@@ -305,7 +331,7 @@ const PetToy = () => {
           <TableHead>名稱</TableHead>
           <TableHead>基底</TableHead>
           <TableHead>娃娃</TableHead>
-          <TableHead>數值上限 (娃娃數量 * 5)</TableHead>
+          <TableHead>數值</TableHead>
           <TableHead>材料</TableHead>
           <TableHead>卡娃地圖</TableHead>
         </TableHeaderWrapper>
@@ -327,24 +353,37 @@ const PetToy = () => {
               <TableColumn>{r.statusLimit}</TableColumn>
               <TableColumn>{r.item}</TableColumn>
               <TableColumn>
-                {r.map.map((mapName) => (
-                  <Map
-                    $unClickable={mapName === '魔幣寵'}
-                    onClick={() => {
-                      if (mapName !== '魔幣寵') {
-                        const mapedResult = result.filter((sr) =>
-                          sr.map.join().includes(mapName)
-                        );
-                        setMap(mapName);
-                        setResult(mapedResult);
-                        window.open(`/pet?map=${mapName}`);
-                      }
-                    }}
-                    key={mapName}
-                  >
-                    {mapName}
-                  </Map>
-                ))}
+                {r.map.map((mapName) => {
+                  const isUnClickable = mapName === '魔幣寵';
+
+                  return (
+                    <MapArrowWrapper key={mapName}>
+                      <Map
+                        $unClickable={isUnClickable}
+                        onClick={() => {
+                          if (!isUnClickable) {
+                            const mapedResult = allToy.filter((sr) =>
+                              sr.map.join().includes(mapName)
+                            );
+                            setBaseMaterial('');
+                            setDoll('');
+                            setToyLevel(allToyLevel[0]);
+                            setToyAbility(allToyAbility[0]);
+                            setMap(mapName);
+                            setResult(mapedResult);
+                          }
+                        }}
+                      >
+                        {mapName}
+                      </Map>
+                      {!isUnClickable && (
+                        <Arrow
+                          onClick={() => window.open(`/pet?map=${mapName}`)}
+                        />
+                      )}
+                    </MapArrowWrapper>
+                  );
+                })}
               </TableColumn>
             </TableRowWrapper>
           ))}
