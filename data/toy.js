@@ -950,7 +950,7 @@ const allToy = [
   {
     id: 80,
     name: '風帆',
-    level: 50,
+    level: 45,
     base: '風帆帆布',
     item: '鋼塊 2 犀牛皮 7 芒果布丁卡',
     doll: '芒果布丁娃娃',

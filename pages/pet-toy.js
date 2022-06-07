@@ -18,6 +18,7 @@ const SearchBox = styled.div`
   box-shadow: 0px 0px 5px 0px black;
   border-radius: 21px;
   padding: 30px;
+  max-width: 100%;
 `;
 
 const SearchSection = styled.div`
