@@ -58,11 +58,17 @@ export default function Home() {
         >
           在這
         </a>
-        , 歡迎加功能或提需求
+        , 歡迎加功能或提需求, 也可以到
+        <a
+          target="_blank"
+          href="https://forum.gamer.com.tw/C.php?bsn=4211&snA=11214&tnum=2"
+          rel="noreferrer"
+        >
+          巴哈討論串
+        </a>
+        討論
       </Text>
-      <Text>
-        另外這個網站還沒有手機版本XD, 所以用手機看可能會跑版, 之後有機會再來做
-      </Text>
+      <Text>另外這個網站不打算做手機版本XD, 所以用手機看會有跑版情形哦~</Text>
     </Root>
   );
 }
